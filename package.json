@@ -1,0 +1,24 @@
+{
+  "name": "node-html-elm",
+  "version": "1.0.0",
+  "description": "Convert html to elm-html",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "npm run watch",
+    "watch": "tsc -w -p .",
+    "lint": "tslint -p ."
+  },
+  "keywords": [],
+  "author": "Hendrik Lammers <lammers@gmail.com> (http://www.hendriklammers.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^10.12.24",
+    "nodemon": "^1.18.10",
+    "prettier": "^1.16.4",
+    "ts-node": "^8.0.2",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.3.3"
+  }
+}
