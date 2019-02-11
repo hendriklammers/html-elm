@@ -13,7 +13,9 @@
   "author": "Hendrik Lammers <lammers@gmail.com> (http://www.hendriklammers.com)",
   "license": "MIT",
   "devDependencies": {
+    "@types/htmlparser2": "^3.7.31",
     "@types/node": "^10.12.24",
+    "htmlparser2": "^3.10.0",
     "nodemon": "^1.18.10",
     "prettier": "^1.16.4",
     "ts-node": "^8.0.2",
