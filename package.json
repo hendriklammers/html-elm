@@ -4,10 +4,10 @@
   "description": "Convert html to elm-html",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsc",
     "start": "npm run watch",
-    "watch": "tsc -w -p .",
-    "lint": "tslint -p ."
+    "watch": "nodemon",
+    "lint": "tslint -p tsconfig.json"
   },
   "keywords": [],
   "author": "Hendrik Lammers <lammers@gmail.com> (http://www.hendriklammers.com)",
