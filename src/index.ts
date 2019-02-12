@@ -1,11 +1,33 @@
 import htmlparser from 'htmlparser2'
 
-const parser = new htmlparser.Parser({
-  onopentag: (name, attribs) => {
-    console.log('name', name)
-    console.log('attribs', attribs)
-  },
-})
+const parseHtml = (input: string, indentation = 4) => {
+  let output = ''
+  const indent = ' '.repeat(indentation)
 
-parser.write('<div class="foo"><span>Hello world</span></div>')
-parser.end()
+  const parser = new htmlparser.Parser(
+    {
+      onopentag: (name, attribs) => {
+        output += name
+        output += '\n' + indent + '[]'
+        output += '\n' + indent + '['
+      },
+
+      ontext: text => {
+        if (text.trim().length) {
+          output += ` text "${text.trim()}" `
+        }
+      },
+
+      onclosetag: _ => {
+        output += ']'
+      },
+    },
+    { decodeEntities: true }
+  )
+  parser.write(input)
+  parser.end()
+
+  return output
+}
+
+export { parseHtml }
