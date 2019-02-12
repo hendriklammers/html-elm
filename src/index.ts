@@ -1,8 +1,8 @@
 import htmlparser from 'htmlparser2'
 
 const parseHtml = (input: string, indentation = 4) => {
-  let output = ''
   const indent = ' '.repeat(indentation)
+  let output = ''
 
   const parser = new htmlparser.Parser(
     {
