@@ -1,5 +1,5 @@
 {
-  "name": "node-html-elm",
+  "name": "html-elm",
   "version": "1.0.0",
   "description": "Convert html to elm-html",
   "main": "./lib/index.js",
