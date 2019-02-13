@@ -1,10 +1,6 @@
 import htmlparser from 'htmlparser2'
 
-interface Attributes {
-  [type: string]: string
-}
-
-const attribsToString = (attribs: Attributes): string => {
+const attribsToString = (attribs: { [type: string]: string }): string => {
   const str = Object.keys(attribs)
     .map(key => ' ' + key + ' "' + attribs[key] + '"')
     .join(',')
@@ -59,9 +55,9 @@ const parseHtml = (input: string): string => {
   return output.join('')
 }
 
-const html = `<div>
-  <h1><span>hello world</span></h1>
-  <p>lorem ipsum</p>
+const html = `<div class="container" id="main">
+  <h1 class="title"><span>hello world</span></h1>
+  <p class="small">lorem ipsum</p>
 </div>`
 console.log(parseHtml(html))
 
