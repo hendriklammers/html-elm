@@ -7,9 +7,9 @@ const attribsToString = (attribs: { [type: string]: string }): string => {
   return str ? str + ' ' : ''
 }
 
-const spaces = (depth: number) => ' '.repeat(depth * 2)
+const spaces = (depth: number, indent = 4) => ' '.repeat(depth * indent)
 
-const parseHtml = (input: string): string => {
+const convert = (input: string, indent = 4): string => {
   const output: string[] = []
   const children = new Set()
   let depth = 0
@@ -19,14 +19,14 @@ const parseHtml = (input: string): string => {
       onopentag: (name, attribs) => {
         let open = ''
         if (children.has(depth)) {
-          open += `\n${spaces(depth)}, `
+          open += `\n${spaces(depth, indent)}, `
         }
         children.add(depth)
         depth++
         open += name
-        open += '\n' + spaces(depth) + '['
+        open += '\n' + spaces(depth, indent) + '['
         open += attribsToString(attribs)
-        open += ']\n' + spaces(depth) + '[ '
+        open += ']\n' + spaces(depth, indent) + '[ '
         output.push(open)
       },
 
@@ -39,7 +39,7 @@ const parseHtml = (input: string): string => {
       onclosetag: name => {
         let close = ''
         if (children.has(depth)) {
-          close += '\n' + spaces(depth)
+          close += '\n' + spaces(depth, indent)
           children.delete(depth)
         }
         close += ']'
@@ -55,10 +55,4 @@ const parseHtml = (input: string): string => {
   return output.join('')
 }
 
-const html = `<div class="container" id="main">
-  <h1 class="title"><span>hello world</span></h1>
-  <p class="small">lorem ipsum</p>
-</div>`
-console.log(parseHtml(html))
-
-export { parseHtml }
+export { convert }
