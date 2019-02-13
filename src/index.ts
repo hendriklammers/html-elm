@@ -1,8 +1,16 @@
 import htmlparser from 'htmlparser2'
 
 const attribsToString = (attribs: { [type: string]: string }): string => {
-  const str = Object.keys(attribs)
-    .map(key => ' ' + key + ' "' + attribs[key] + '"')
+  const str = Object.entries(attribs)
+    .map(([key, value]) => {
+      // The Html.Attributes package uses type_
+      if (key === 'type') {
+        key = 'type_'
+      }
+      // Treat attributes without value as boolean ('readonly' for example)
+      value = value ? `"${value}"` : 'True'
+      return ' ' + key + ' ' + value
+    })
     .join(',')
   return str ? str + ' ' : ''
 }
