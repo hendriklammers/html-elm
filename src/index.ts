@@ -19,20 +19,23 @@ const convert = (input: string, indent = 4): string => {
       onopentag: (name, attribs) => {
         let open = ''
         if (children.has(depth)) {
-          open += `\n${spaces(depth, indent)}, `
+          open += `\n${spaces(depth, indent)},`
+        }
+        if (depth > 0) {
+          open += ' '
         }
         children.add(depth)
         depth++
         open += name
         open += '\n' + spaces(depth, indent) + '['
         open += attribsToString(attribs)
-        open += ']\n' + spaces(depth, indent) + '[ '
+        open += ']\n' + spaces(depth, indent) + '['
         output.push(open)
       },
 
       ontext: text => {
         if (text.trim().length) {
-          output.push(`text "${text.trim()}" `)
+          output.push(` text "${text.trim()}" `)
         }
       },
 
