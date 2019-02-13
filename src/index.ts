@@ -1,15 +1,23 @@
 import htmlparser from 'htmlparser2'
 
-const parseHtml = (input: string, indentation = 4) => {
-  const indent = ' '.repeat(indentation)
+const attribsToString = (attribs: {}): string => {
+  const str = Object.entries(attribs)
+    .map(attr => ' ' + attr[0] + ' "' + attr[1] + '"')
+    .join(',')
+  return str ? str + ' ' : ''
+}
+
+const parseHtml = (input: string) => {
+  const indent = ' '.repeat(2)
   let output = ''
 
   const parser = new htmlparser.Parser(
     {
       onopentag: (name, attribs) => {
         output += name
-        output += '\n' + indent + '[]'
         output += '\n' + indent + '['
+        output += attribsToString(attribs)
+        output += ']\n' + indent + '['
       },
 
       ontext: text => {
@@ -29,5 +37,8 @@ const parseHtml = (input: string, indentation = 4) => {
 
   return output
 }
+
+const html = '<div class="container green" id="my-app">hello world</div>'
+console.log(parseHtml(html))
 
 export { parseHtml }
