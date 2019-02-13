@@ -1,23 +1,33 @@
 import htmlparser from 'htmlparser2'
 
-const attribsToString = (attribs: {}): string => {
-  const str = Object.entries(attribs)
-    .map(attr => ' ' + attr[0] + ' "' + attr[1] + '"')
+interface Attributes {
+  [type: string]: string
+}
+
+const attribsToString = (attribs: Attributes): string => {
+  const str = Object.keys(attribs)
+    .map(key => ' ' + key + ' "' + attribs[key] + '"')
     .join(',')
   return str ? str + ' ' : ''
 }
 
+const spaces = (depth: number) => ' '.repeat(depth * 2)
+
 const parseHtml = (input: string) => {
-  const indent = ' '.repeat(2)
+  let indent = 0
   let output = ''
 
   const parser = new htmlparser.Parser(
     {
       onopentag: (name, attribs) => {
+        if (indent > 0) {
+          output += ' '
+        }
+        indent++
         output += name
-        output += '\n' + indent + '['
+        output += '\n' + spaces(indent) + '['
         output += attribsToString(attribs)
-        output += ']\n' + indent + '['
+        output += ']\n' + spaces(indent) + '['
       },
 
       ontext: text => {
@@ -27,7 +37,8 @@ const parseHtml = (input: string) => {
       },
 
       onclosetag: _ => {
-        output += ']'
+        indent--
+        output += '\n' + spaces(indent) + ']'
       },
     },
     { decodeEntities: true }
@@ -38,7 +49,11 @@ const parseHtml = (input: string) => {
   return output
 }
 
-const html = '<div class="container green" id="my-app">hello world</div>'
+const html = `<div class="container green" id="my-app">
+  <span>
+    <h1 class="title">hello world</h1>
+  </span>
+</div>`
 console.log(parseHtml(html))
 
 export { parseHtml }
