@@ -13,46 +13,55 @@ const attribsToString = (attribs: Attributes): string => {
 
 const spaces = (depth: number) => ' '.repeat(depth * 2)
 
-const parseHtml = (input: string) => {
-  let indent = 0
-  let output = ''
+const parseHtml = (input: string): string => {
+  const output: string[] = []
+  const children = new Set()
+  let depth = 0
 
   const parser = new htmlparser.Parser(
     {
       onopentag: (name, attribs) => {
-        if (indent > 0) {
-          output += ' '
+        let open = ''
+        if (children.has(depth)) {
+          open += `\n${spaces(depth)}, `
         }
-        indent++
-        output += name
-        output += '\n' + spaces(indent) + '['
-        output += attribsToString(attribs)
-        output += ']\n' + spaces(indent) + '['
+        children.add(depth)
+        depth++
+        open += name
+        open += '\n' + spaces(depth) + '['
+        open += attribsToString(attribs)
+        open += ']\n' + spaces(depth) + '[ '
+        output.push(open)
       },
 
       ontext: text => {
         if (text.trim().length) {
-          output += ` text "${text.trim()}" `
+          output.push(`text "${text.trim()}" `)
         }
       },
 
-      onclosetag: _ => {
-        indent--
-        output += '\n' + spaces(indent) + ']'
+      onclosetag: name => {
+        let close = ''
+        if (children.has(depth)) {
+          close += '\n' + spaces(depth)
+          children.delete(depth)
+        }
+        close += ']'
+        depth--
+        output.push(close)
       },
     },
-    { decodeEntities: true }
+    { decodeEntities: true, lowerCaseAttributeNames: true }
   )
   parser.write(input)
   parser.end()
 
-  return output
+  return output.join('')
 }
 
-const html = `<div class="container green" id="my-app">
-  <span>
-    <h1 class="title">hello world</h1>
-  </span>
+const html = `<div>
+  <h1><span>hello world</span></h1>
+  <p>lorem ipsum</p>
 </div>`
 console.log(parseHtml(html))
 
