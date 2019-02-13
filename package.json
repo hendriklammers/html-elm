@@ -2,6 +2,7 @@
   "name": "html-elm",
   "version": "1.0.0",
   "description": "Convert html to elm-html",
+  "repository": "github:hendriklammers/node-html-elm",
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsc",
@@ -10,7 +11,12 @@
     "lint": "tslint -p tsconfig.json",
     "test": "jest --watch"
   },
-  "keywords": [],
+  "keywords": [
+    "elm",
+    "html",
+    "parser",
+    "convert"
+  ],
   "author": "Hendrik Lammers <lammers@gmail.com> (http://www.hendriklammers.com)",
   "license": "MIT",
   "devDependencies": {
