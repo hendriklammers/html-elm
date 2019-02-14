@@ -7,7 +7,9 @@ enum Previous {
   None,
 }
 
-const getPrevious = (output: string[]): Previous => {
+type Output = string[]
+
+const getPrevious = (output: Output): Previous => {
   const prev = output.length ? output[output.length - 1] : ''
   if (/\[$/.test(prev)) {
     return Previous.Open
@@ -34,10 +36,9 @@ const attribsToString = (attribs: { [type: string]: string }): string => {
   return str ? str + ' ' : ''
 }
 
-const spaces = (depth: number, indent = 4) => ' '.repeat(depth * indent)
-
 const convert = (input: string, indent = 4): string => {
-  const output: string[] = []
+  const spaces = (amount: number) => ' '.repeat(amount * indent)
+  const output: Output = []
   let depth = 0
 
   const parser = new htmlparser.Parser(
@@ -50,31 +51,31 @@ const convert = (input: string, indent = 4): string => {
             break
           case Previous.Close:
           case Previous.Text:
-            open += '\n' + spaces(depth, indent) + ', '
+            open += '\n' + spaces(depth) + ', '
             break
         }
         depth++
         open += name
-        open += '\n' + spaces(depth, indent) + '['
+        open += '\n' + spaces(depth) + '['
         open += attribsToString(attribs)
-        open += ']\n' + spaces(depth, indent) + '['
+        open += ']\n' + spaces(depth) + '['
         output.push(open)
       },
 
       ontext: text => {
         if (text.trim().length) {
           if (getPrevious(output) === Previous.Close) {
-            output.push('\n' + spaces(depth, indent) + ',')
+            output.push('\n' + spaces(depth) + ',')
           }
           output.push(` text "${text.trim()}"`)
         }
       },
 
-      onclosetag: name => {
+      onclosetag: _ => {
         let close = ''
         switch (getPrevious(output)) {
           case Previous.Close:
-            close += '\n' + spaces(depth, indent)
+            close += '\n' + spaces(depth)
             break
           case Previous.Text:
             close += ' '
