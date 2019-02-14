@@ -61,10 +61,8 @@ const convert = (html: string, { indent = 4 } = {}): string => {
       },
 
       ontext: text => {
+        // TODO: Add support for html tags inside text
         if (text.trim().length) {
-          if (previousFragment(fragments) === Fragment.Close) {
-            fragments.push('\n' + spaces(depth) + ',')
-          }
           fragments.push(` text "${text.trim()}"`)
         }
       },

@@ -25,7 +25,7 @@ describe('Convert html to elm', () => {
     expect(convert(html)).toBe(elm)
   })
 
-  it.skip('works with nested tags', () => {
+  it('works with nested tags', () => {
     const html = '<div><span>Hello world</span><span>second</span></div>'
     const elm = `div
     []
