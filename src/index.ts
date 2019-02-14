@@ -1,5 +1,24 @@
 import htmlparser from 'htmlparser2'
 
+enum Previous {
+  Open,
+  Close,
+  Text,
+  None,
+}
+
+const getPrevious = (output: string[]): Previous => {
+  const prev = output.length ? output[output.length - 1] : ''
+  if (/\[$/.test(prev)) {
+    return Previous.Open
+  } else if (/\]$/.test(prev)) {
+    return Previous.Close
+  } else if (/^\stext\s".*"$/.test(prev)) {
+    return Previous.Text
+  }
+  return Previous.None
+}
+
 const attribsToString = (attribs: { [type: string]: string }): string => {
   const str = Object.entries(attribs)
     .map(([key, value]) => {
@@ -7,7 +26,7 @@ const attribsToString = (attribs: { [type: string]: string }): string => {
       if (key === 'type') {
         key = 'type_'
       }
-      // Treat attributes without value as boolean ('readonly' for example)
+      // Treat attributes without value as truthy boolean
       value = value ? `"${value}"` : 'True'
       return ' ' + key + ' ' + value
     })
@@ -19,20 +38,21 @@ const spaces = (depth: number, indent = 4) => ' '.repeat(depth * indent)
 
 const convert = (input: string, indent = 4): string => {
   const output: string[] = []
-  const children = new Set()
   let depth = 0
 
   const parser = new htmlparser.Parser(
     {
       onopentag: (name, attribs) => {
         let open = ''
-        if (children.has(depth)) {
-          open += `\n${spaces(depth, indent)},`
+        switch (getPrevious(output)) {
+          case Previous.Open:
+            open += ' '
+            break
+          case Previous.Close:
+          case Previous.Text:
+            open += '\n' + spaces(depth, indent) + ', '
+            break
         }
-        if (depth > 0) {
-          open += ' '
-        }
-        children.add(depth)
         depth++
         open += name
         open += '\n' + spaces(depth, indent) + '['
@@ -43,15 +63,22 @@ const convert = (input: string, indent = 4): string => {
 
       ontext: text => {
         if (text.trim().length) {
-          output.push(` text "${text.trim()}" `)
+          if (getPrevious(output) === Previous.Close) {
+            output.push('\n' + spaces(depth, indent) + ',')
+          }
+          output.push(` text "${text.trim()}"`)
         }
       },
 
       onclosetag: name => {
         let close = ''
-        if (children.has(depth)) {
-          close += '\n' + spaces(depth, indent)
-          children.delete(depth)
+        switch (getPrevious(output)) {
+          case Previous.Close:
+            close += '\n' + spaces(depth, indent)
+            break
+          case Previous.Text:
+            close += ' '
+            break
         }
         close += ']'
         depth--
