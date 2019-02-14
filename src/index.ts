@@ -1,27 +1,25 @@
 import htmlparser from 'htmlparser2'
 
-enum Previous {
+enum Fragment {
   Open,
   Close,
   Text,
   None,
 }
 
-type Output = string[]
-
-const getPrevious = (output: Output): Previous => {
-  const prev = output.length ? output[output.length - 1] : ''
+const previousFragment = (fragments: string[]): Fragment => {
+  const prev = fragments.length ? fragments[fragments.length - 1] : ''
   if (/\[$/.test(prev)) {
-    return Previous.Open
+    return Fragment.Open
   } else if (/\]$/.test(prev)) {
-    return Previous.Close
+    return Fragment.Close
   } else if (/^\stext\s".*"$/.test(prev)) {
-    return Previous.Text
+    return Fragment.Text
   }
-  return Previous.None
+  return Fragment.None
 }
 
-const attribsToString = (attribs: { [type: string]: string }): string => {
+const attributesToString = (attribs: { [type: string]: string }): string => {
   const str = Object.entries(attribs)
     .map(([key, value]) => {
       // The Html.Attributes package uses type_
@@ -38,52 +36,52 @@ const attribsToString = (attribs: { [type: string]: string }): string => {
 
 const convert = (input: string, indent = 4): string => {
   const spaces = (amount: number) => ' '.repeat(amount * indent)
-  const output: Output = []
+  const fragments: string[] = []
   let depth = 0
 
   const parser = new htmlparser.Parser(
     {
       onopentag: (name, attribs) => {
         let open = ''
-        switch (getPrevious(output)) {
-          case Previous.Open:
+        switch (previousFragment(fragments)) {
+          case Fragment.Open:
             open += ' '
             break
-          case Previous.Close:
-          case Previous.Text:
+          case Fragment.Close:
+          case Fragment.Text:
             open += '\n' + spaces(depth) + ', '
             break
         }
         depth++
         open += name
         open += '\n' + spaces(depth) + '['
-        open += attribsToString(attribs)
+        open += attributesToString(attribs)
         open += ']\n' + spaces(depth) + '['
-        output.push(open)
+        fragments.push(open)
       },
 
       ontext: text => {
         if (text.trim().length) {
-          if (getPrevious(output) === Previous.Close) {
-            output.push('\n' + spaces(depth) + ',')
+          if (previousFragment(fragments) === Fragment.Close) {
+            fragments.push('\n' + spaces(depth) + ',')
           }
-          output.push(` text "${text.trim()}"`)
+          fragments.push(` text "${text.trim()}"`)
         }
       },
 
       onclosetag: _ => {
         let close = ''
-        switch (getPrevious(output)) {
-          case Previous.Close:
+        switch (previousFragment(fragments)) {
+          case Fragment.Close:
             close += '\n' + spaces(depth)
             break
-          case Previous.Text:
+          case Fragment.Text:
             close += ' '
             break
         }
         close += ']'
         depth--
-        output.push(close)
+        fragments.push(close)
       },
     },
     { decodeEntities: true, lowerCaseAttributeNames: true }
@@ -91,7 +89,7 @@ const convert = (input: string, indent = 4): string => {
   parser.write(input)
   parser.end()
 
-  return output.join('')
+  return fragments.join('')
 }
 
 export { convert }
