@@ -34,7 +34,7 @@ const attributesToString = (attribs: { [type: string]: string }): string => {
   return str ? str + ' ' : ''
 }
 
-const convert = (input: string, indent = 4): string => {
+const convert = (html: string, { indent = 4 } = {}): string => {
   const spaces = (amount: number) => ' '.repeat(amount * indent)
   const fragments: string[] = []
   let depth = 0
@@ -86,7 +86,7 @@ const convert = (input: string, indent = 4): string => {
     },
     { decodeEntities: true, lowerCaseAttributeNames: true }
   )
-  parser.write(input)
+  parser.write(html)
   parser.end()
 
   return fragments.join('')

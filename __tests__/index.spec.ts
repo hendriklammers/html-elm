@@ -9,6 +9,13 @@ describe('Convert html to elm', () => {
     expect(convert(html)).toBe(elm)
   })
 
+  it('converts an empty tag', () => {
+    const elm = `div
+    []
+    []`
+    expect(convert('<div/>')).toBe(elm)
+  })
+
   it('trims whitespace', () => {
     const html = `<div>
         Hello world   </div>`
@@ -65,6 +72,6 @@ describe('Convert html to elm', () => {
       [ text "title" ]
     ]
   ]`
-    expect(convert(html, 2)).toBe(elm)
+    expect(convert(html, { indent: 2 })).toBe(elm)
   })
 })
