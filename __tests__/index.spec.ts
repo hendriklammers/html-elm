@@ -38,8 +38,8 @@ describe('Convert html to elm', () => {
     []
     [ text "This is an"
     , strong
-      []
-      [ text "important" ]
+        []
+        [ text "important" ]
     , text "paragraph"
     ]`
     expect(convert(html)).toBe(elm)
