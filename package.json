@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "Convert html to elm-html",
   "repository": "github:hendriklammers/html-elm",
-  "main": "./lib/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.js",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
     "clean": "rimraf lib coverage",
-    "start": "nodemon --watch src/**/*.ts --exec ts-node src/index.ts",
     "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "start": "nodemon --watch src/**/*.ts --exec ts-node src/index.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
@@ -21,11 +24,15 @@
   ],
   "author": "Hendrik Lammers <lammers@gmail.com> (http://www.hendriklammers.com)",
   "license": "MIT",
+  "dependencies": {
+    "@types/commander": "^2.12.2",
+    "commander": "^2.19.0",
+    "htmlparser2": "^3.10.0"
+  },
   "devDependencies": {
     "@types/htmlparser2": "^3.7.31",
     "@types/jest": "^24.0.0",
     "@types/node": "^10.12.24",
-    "htmlparser2": "^3.10.0",
     "jest": "^24.1.0",
     "nodemon": "^1.18.10",
     "prettier": "^1.16.4",
@@ -37,6 +44,9 @@
     "typescript": "^3.3.3"
   },
   "bin": {
-    "html-elm": "./lib/cli.js"
-  }
+    "html-elm": "lib/cli.js"
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }
