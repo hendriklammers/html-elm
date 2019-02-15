@@ -13,7 +13,6 @@
     "jsx": "react"
   },
   "include": [
-    "src/**/*",
-    "__tests__/**/*"
+    "src/**/*"
   ]
 }
