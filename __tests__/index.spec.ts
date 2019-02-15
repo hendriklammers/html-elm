@@ -1,4 +1,4 @@
-import { convert } from '../src/index'
+import convert from '../src/index'
 
 describe('Convert html to elm', () => {
   it('converts a single html element', () => {

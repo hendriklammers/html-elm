@@ -90,4 +90,4 @@ const convert = (html: string, { indent = 4 } = {}): string => {
   return fragments.join('')
 }
 
-export { convert }
+export default convert
