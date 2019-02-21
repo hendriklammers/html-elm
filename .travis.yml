@@ -3,4 +3,5 @@ node_js:
   - '10'
   - '8'
 script:
+  - npm test
   - npm run build
