@@ -39,6 +39,20 @@ describe('Convert html to elm', () => {
     expect(convert(html)).toBe(elm)
   })
 
+  it('has a htmlAlias option', () => {
+    const html = '<div><span>Hello world</span><span>second</span></div>'
+    const elm = `H.div
+    []
+    [ H.span
+        []
+        [ H.text "Hello world" ]
+    , H.span
+        []
+        [ H.text "second" ]
+    ]`
+    expect(convert(html, { htmlAlias: 'H' })).toBe(elm)
+  })
+
   it('parses attributes', () => {
     const html =
       '<input class="form-control" type="text" placeholder="Search" readonly>'

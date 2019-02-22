@@ -13,7 +13,7 @@ const previousFragment = (fragments: string[]): Fragment => {
     return Fragment.Open
   } else if (/\]$/.test(prev)) {
     return Fragment.Close
-  } else if (/^\stext\s".*"$/.test(prev)) {
+  } else if (/^\s([A-Za-z]+\.)?text\s".*"$/.test(prev)) {
     return Fragment.Text
   }
   return Fragment.None
@@ -46,7 +46,7 @@ interface Options {
   htmlAlias?: string
 }
 
-export default (html: string, options: Options = {}): string => {
+const convert = (html: string, options: Options = {}): string => {
   const { indent = 4, attributeAlias = '', htmlAlias = '' } = options
   const spaces = (amount: number) => ' '.repeat(amount * indent)
   const fragments: string[] = []
@@ -66,6 +66,9 @@ export default (html: string, options: Options = {}): string => {
             break
         }
         depth++
+        if (htmlAlias.length) {
+          open += htmlAlias + '.'
+        }
         open += name
         open += '\n' + spaces(depth) + '['
         open += attributesToString(attribs, attributeAlias)
@@ -76,7 +79,8 @@ export default (html: string, options: Options = {}): string => {
       ontext: text => {
         // TODO: Add support for html tags inside text
         if (text.trim().length) {
-          fragments.push(` text "${text.trim()}"`)
+          const tag = htmlAlias.length ? `${htmlAlias}.text` : 'text'
+          fragments.push(` ${tag} "${text.trim()}"`)
         }
       },
 
@@ -102,3 +106,5 @@ export default (html: string, options: Options = {}): string => {
 
   return fragments.join('')
 }
+
+export default convert
