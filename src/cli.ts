@@ -7,6 +7,9 @@ program
   .option('-i, --indent <n>', 'Number of spaces used for indentation', 4)
   .parse(process.argv)
 
-const output = convert(program.args.join(''), { indent: program.indent })
-
-console.log(output)
+const elmString = convert(program.args.join(''), { indent: program.indent })
+if (elmString) {
+  console.log(elmString)
+} else {
+  console.log('Please provide a valid HTML string to be converted to Elm')
+}
