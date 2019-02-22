@@ -19,12 +19,18 @@ const previousFragment = (fragments: string[]): Fragment => {
   return Fragment.None
 }
 
-const attributesToString = (attribs: { [type: string]: string }): string => {
+const attributesToString = (
+  attribs: { [type: string]: string },
+  alias: null | string
+): string => {
   const str = Object.entries(attribs)
     .map(([key, value]) => {
       // The Html.Attributes package uses type_
       if (key === 'type') {
         key = 'type_'
+      }
+      if (alias) {
+        key = alias + '.' + key
       }
       // Treat attributes without value as truthy boolean
       value = value ? `"${value}"` : 'True'
@@ -34,7 +40,10 @@ const attributesToString = (attribs: { [type: string]: string }): string => {
   return str ? str + ' ' : ''
 }
 
-const convert = (html: string, { indent = 4 } = {}): string => {
+const convert = (
+  html: string,
+  { indent = 4, attributeAlias = null } = {}
+): string => {
   const spaces = (amount: number) => ' '.repeat(amount * indent)
   const fragments: string[] = []
   let depth = 0
@@ -55,7 +64,7 @@ const convert = (html: string, { indent = 4 } = {}): string => {
         depth++
         open += name
         open += '\n' + spaces(depth) + '['
-        open += attributesToString(attribs)
+        open += attributesToString(attribs, attributeAlias)
         open += ']\n' + spaces(depth) + '['
         fragments.push(open)
       },

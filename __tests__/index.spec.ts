@@ -48,7 +48,16 @@ describe('Convert html to elm', () => {
     expect(convert(html)).toBe(elm)
   })
 
-  it('takes the indentation as argument', () => {
+  it('has a attributeAlias option', () => {
+    const html =
+      '<input class="form-control" type="text" placeholder="Search" readonly>'
+    const elm = `input
+    [ A.class "form-control", A.type_ "text", A.placeholder "Search", A.readonly True ]
+    []`
+    expect(convert(html, { attributeAlias: 'A' })).toBe(elm)
+  })
+
+  it('has and indent option', () => {
     const html = '<div><div><p>title</p></div></div>'
     const elm = `div
   []
