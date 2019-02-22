@@ -20,7 +20,8 @@
     "elm",
     "html",
     "parser",
-    "convert"
+    "convert",
+    "cli"
   ],
   "author": "Hendrik Lammers <lammers@gmail.com> (http://www.hendriklammers.com)",
   "license": "MIT",

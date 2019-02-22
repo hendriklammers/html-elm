@@ -1,6 +1,6 @@
 # html-elm [![Build Status](https://travis-ci.org/hendriklammers/html-elm.svg?branch=master)](https://travis-ci.org/hendriklammers/html-elm)
 
-Convert html to elm-html
+CLI tool to convert html to elm-html
 
 
 ## Install
@@ -26,6 +26,11 @@ div
     ]
 ```
 
+To see all available options use:
+
+```
+$ html-elm -h
+```
 
 ## License
 
