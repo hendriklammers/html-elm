@@ -21,7 +21,7 @@ const previousFragment = (fragments: string[]): Fragment => {
 
 const attributesToString = (
   attribs: { [type: string]: string },
-  alias: null | string
+  alias: string
 ): string => {
   const str = Object.entries(attribs)
     .map(([key, value]) => {
@@ -29,7 +29,7 @@ const attributesToString = (
       if (key === 'type') {
         key = 'type_'
       }
-      if (alias) {
+      if (alias.length) {
         key = alias + '.' + key
       }
       // Treat attributes without value as truthy boolean
@@ -40,10 +40,14 @@ const attributesToString = (
   return str ? str + ' ' : ''
 }
 
-const convert = (
-  html: string,
-  { indent = 4, attributeAlias = null } = {}
-): string => {
+interface Options {
+  indent?: number
+  attributeAlias?: string
+  htmlAlias?: string
+}
+
+export default (html: string, options: Options = {}): string => {
+  const { indent = 4, attributeAlias = '', htmlAlias = '' } = options
   const spaces = (amount: number) => ' '.repeat(amount * indent)
   const fragments: string[] = []
   let depth = 0
@@ -98,5 +102,3 @@ const convert = (
 
   return fragments.join('')
 }
-
-export default convert
