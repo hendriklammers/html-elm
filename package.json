@@ -1,6 +1,6 @@
 {
   "name": "html-elm",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Convert html to elm-html",
   "repository": "github:hendriklammers/html-elm",
   "main": "lib/index.js",
