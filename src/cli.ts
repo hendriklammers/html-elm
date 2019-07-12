@@ -3,7 +3,7 @@ import program from 'commander'
 import convert from './index'
 
 program
-  .version('1.2.1')
+  .version('1.3.0')
   .option('-i, --indent [n]', 'Number of spaces used for indentation', 4)
   .option(
     '-t, --html-alias [prefix]',
