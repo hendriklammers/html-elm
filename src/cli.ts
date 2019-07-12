@@ -15,13 +15,21 @@ program
   )
   .parse(process.argv)
 
-const elmString = convert(program.args.join(''), {
+const options = {
   indent: program.indent,
   htmlAlias: program.htmlAlias,
   attributeAlias: program.attributeAlias,
-})
-if (elmString) {
-  console.log(elmString)
+}
+
+if (process.stdin.isTTY) {
+  process.stdout.write(convert(program.args.join(''), options) + '\n')
 } else {
-  console.log('Please provide a valid HTML string to be converted to Elm')
+  // When data is piped into the program
+  let data = ''
+  process.stdin.resume()
+  process.stdin.setEncoding('utf8')
+  process.stdin.on('data', chunk => (data += chunk))
+  process.stdin.on('end', () =>
+    process.stdout.write(convert(data, options) + '\n')
+  )
 }
