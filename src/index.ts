@@ -46,65 +46,70 @@ interface Options {
   htmlAlias?: string
 }
 
-const convert = (html: string, options: Options = {}): string => {
-  const { indent = 4, attributeAlias = '', htmlAlias = '' } = options
-  const spaces = (amount: number) => ' '.repeat(amount * indent)
-  const fragments: string[] = []
-  let depth = 0
+const convert = (html: string, options: Options = {}): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const { indent = 4, attributeAlias = '', htmlAlias = '' } = options
+    const spaces = (amount: number) => ' '.repeat(amount * indent)
+    const fragments: string[] = []
+    let depth = 0
 
-  const parser = new htmlparser.Parser(
-    {
-      onopentag: (name, attribs) => {
-        let open = ''
-        switch (previousFragment(fragments)) {
-          case Fragment.Open:
-            open += ' '
-            break
-          case Fragment.Close:
-          case Fragment.Text:
-            open += '\n' + spaces(depth) + ', '
-            break
-        }
-        depth++
-        if (htmlAlias.length) {
-          open += htmlAlias + '.'
-        }
-        open += name
-        open += '\n' + spaces(depth) + '['
-        open += attributesToString(attribs, attributeAlias)
-        open += ']\n' + spaces(depth) + '['
-        fragments.push(open)
+    const parser = new htmlparser.Parser(
+      {
+        onopentag: (name, attribs) => {
+          let open = ''
+          switch (previousFragment(fragments)) {
+            case Fragment.Open:
+              open += ' '
+              break
+            case Fragment.Close:
+            case Fragment.Text:
+              open += '\n' + spaces(depth) + ', '
+              break
+          }
+          depth++
+          if (htmlAlias.length) {
+            open += htmlAlias + '.'
+          }
+          open += name
+          open += '\n' + spaces(depth) + '['
+          open += attributesToString(attribs, attributeAlias)
+          open += ']\n' + spaces(depth) + '['
+          fragments.push(open)
+        },
+
+        ontext: text => {
+          // TODO: Add support for html tags inside text
+          if (text.trim().length) {
+            const tag = htmlAlias.length ? `${htmlAlias}.text` : 'text'
+            fragments.push(` ${tag} "${text.trim()}"`)
+          }
+        },
+
+        onclosetag: _ => {
+          let close = ''
+          switch (previousFragment(fragments)) {
+            case Fragment.Close:
+              close += '\n' + spaces(depth)
+              break
+            case Fragment.Text:
+              close += ' '
+              break
+          }
+          close += ']'
+          depth--
+          fragments.push(close)
+        },
+
+        onerror: err => {
+          reject(err)
+        },
       },
+      { decodeEntities: true, lowerCaseAttributeNames: true }
+    )
+    parser.write(html)
+    parser.end()
 
-      ontext: text => {
-        // TODO: Add support for html tags inside text
-        if (text.trim().length) {
-          const tag = htmlAlias.length ? `${htmlAlias}.text` : 'text'
-          fragments.push(` ${tag} "${text.trim()}"`)
-        }
-      },
-
-      onclosetag: _ => {
-        let close = ''
-        switch (previousFragment(fragments)) {
-          case Fragment.Close:
-            close += '\n' + spaces(depth)
-            break
-          case Fragment.Text:
-            close += ' '
-            break
-        }
-        close += ']'
-        depth--
-        fragments.push(close)
-      },
-    },
-    { decodeEntities: true, lowerCaseAttributeNames: true }
-  )
-  parser.write(html)
-  parser.end()
-
-  return fragments.join('')
-}
+    resolve(fragments.join(''))
+  })
 
 export default convert
