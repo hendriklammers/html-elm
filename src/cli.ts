@@ -22,14 +22,17 @@ const options = {
 }
 
 if (process.stdin.isTTY) {
-  process.stdout.write(convert(program.args.join(''), options) + '\n')
+  convert(program.args.join(''), options).then(result =>
+    process.stdout.write(result + '\n')
+  )
 } else {
   // When data is piped into the program
   let data = ''
   process.stdin.resume()
   process.stdin.setEncoding('utf8')
   process.stdin.on('data', chunk => (data += chunk))
-  process.stdin.on('end', () =>
-    process.stdout.write(convert(data, options) + '\n')
-  )
+  process.stdin.on('end', async () => {
+    const result = await convert(data, options)
+    process.stdout.write(result + '\n')
+  })
 }
