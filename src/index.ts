@@ -34,29 +34,31 @@ const attributesToString = (
         key = 'type_'
       }
 
-      if (key === 'in') {
-        key = 'in_'
-      }
-
       if (isSvg) {
+        if (key === 'in') {
+          key = 'in_'
+        }
+
         if (key === 'xmlns') {
           key = 'xmlSpace'
         }
 
         // Check for svg attributes
         // TODO: Do something similar for HTML
-        key =
-          svgAttributes[key.toLowerCase().replace(/-/g, '')] ||
-          `attribute "${key}"`
+        key = svgAttributes[key.toLowerCase().replace(/-|:/g, '')]
 
-        return ` ${key} ${value}`
+        // Unvalid attribute
+        if (!key) {
+          return ''
+        }
       }
 
       if (alias.length) {
         key = alias + '.' + key
       }
-      return ' ' + key + ' ' + value
+      return ` ${key} ${value}`
     })
+    .filter(attr => attr !== '')
     .join(',')
   return str ? str + ' ' : ''
 }
