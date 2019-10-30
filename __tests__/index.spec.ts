@@ -156,4 +156,18 @@ describe('Convert SVG to Elm', () => {
     const result = await convert(svg)
     expect(result).toBe(elm)
   })
+
+  it('ignores invalid attributes', async () => {
+    const svg = `<svg width="600" height="400" viewBox="0 0 600 400" xmlFoo="foo">
+<rect foo="123" width="600" height="400" fill="#FFDA1A" bar="bar" />
+</svg>`
+    const elm = `svg
+    [ width "600", height "400", viewBox "0 0 600 400" ]
+    [ rect
+        [ width "600", height "400", fill "#FFDA1A" ]
+        []
+    ]`
+    const result = await convert(svg)
+    expect(result).toBe(elm)
+  })
 })
