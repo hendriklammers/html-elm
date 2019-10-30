@@ -1,5 +1,5 @@
 import htmlparser from 'htmlparser2'
-import { svgAttributes } from './attributes'
+import attributes from './attributes'
 
 enum Fragment {
   Open,
@@ -45,7 +45,7 @@ const attributesToString = (
 
         // Check for svg attributes
         // TODO: Do something similar for HTML
-        key = svgAttributes[key.toLowerCase().replace(/-|:/g, '')]
+        key = attributes.svg[key.toLowerCase().replace(/-|:/g, '')]
 
         // Unvalid attribute
         if (!key) {
