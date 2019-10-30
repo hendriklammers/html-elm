@@ -1,5 +1,5 @@
 // All available SVG attributes in Elm
-export const svgAttributes: { [key: string]: string } = {
+export const svg: { [key: string]: string } = {
   accentheight: 'accentHeight',
   accelerate: 'accelerate',
   accumulate: 'accumulate',
@@ -255,3 +255,6 @@ export const svgAttributes: { [key: string]: string } = {
   writingmode: 'writingMode',
 }
 
+export default {
+  svg,
+}
