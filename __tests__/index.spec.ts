@@ -187,4 +187,36 @@ describe('Convert SVG to Elm', () => {
     })
     expect(result).toBe(elm)
   })
+
+  it('supports svg inside html', async () => {
+    const html = `<section>
+  <h1 class="title">Hello</h1>
+  <div>
+    <svg width="600" height="400" viewBox="0 0 600 400">
+      <rect width="600" height="400" fill="#FFDA1A" />
+    </svg>
+  </div>
+</section>`
+    const elm = `section
+    []
+    [ h1
+        [ H.class "title" ]
+        [ text "Hello" ]
+    , div
+        []
+        [ S.svg
+            [ SA.width "600", SA.height "400", SA.viewBox "0 0 600 400" ]
+            [ S.rect
+                [ SA.width "600", SA.height "400", SA.fill "#FFDA1A" ]
+                []
+            ]
+        ]
+    ]`
+    const result = await convert(html, {
+      htmlAttributeAlias: 'H',
+      svgAlias: 'S',
+      svgAttributeAlias: 'SA',
+    })
+    expect(result).toBe(elm)
+  })
 })
