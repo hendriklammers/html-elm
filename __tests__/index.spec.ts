@@ -68,13 +68,13 @@ describe('Convert html to Elm', () => {
     expect(result).toBe(elm)
   })
 
-  it('has a attributeAlias option', async () => {
+  it('has a htmlAttributeAlias option', async () => {
     const html =
       '<input class="form-control" type="text" placeholder="Search" readonly>'
     const elm = `input
     [ A.class "form-control", A.type_ "text", A.placeholder "Search", A.readonly True ]
     []`
-    const result = await convert(html, { attributeAlias: 'A' })
+    const result = await convert(html, { htmlAttributeAlias: 'A' })
     expect(result).toBe(elm)
   })
 
@@ -168,6 +168,23 @@ describe('Convert SVG to Elm', () => {
         []
     ]`
     const result = await convert(svg)
+    expect(result).toBe(elm)
+  })
+
+  it('has a svgAlias and svgAttributeAlias option', async () => {
+    const svg = `<svg width="600" height="400" viewBox="0 0 600 400">
+<rect width="600" height="400" fill="#FFDA1A" />
+</svg>`
+    const elm = `Svg.svg
+    [ SA.width "600", SA.height "400", SA.viewBox "0 0 600 400" ]
+    [ Svg.rect
+        [ SA.width "600", SA.height "400", SA.fill "#FFDA1A" ]
+        []
+    ]`
+    const result = await convert(svg, {
+      svgAlias: 'Svg',
+      svgAttributeAlias: 'SA',
+    })
     expect(result).toBe(elm)
   })
 })
