@@ -63,15 +63,25 @@ const attributesToString = (
   return str ? str + ' ' : ''
 }
 
-interface Options {
-  indent?: number
-  attributeAlias?: string
-  htmlAlias?: string
-}
+// All options are optional
+type Options = Partial<{
+  indent: number
+  htmlAlias: string
+  htmlAttributeAlias: string
+  svgAlias: string
+  svgAttributeAlias: string
+}>
 
 const convert = (html: string, options: Options = {}): Promise<string> =>
   new Promise((resolve, reject) => {
-    const { indent = 4, attributeAlias = '', htmlAlias = '' } = options
+    const {
+      indent = 4,
+      htmlAlias = '',
+      htmlAttributeAlias = '',
+      svgAlias = '',
+      svgAttributeAlias = '',
+    } = options
+
     const spaces = (amount: number) => ' '.repeat(amount * indent)
     const fragments: string[] = []
     let depth = 0
@@ -95,12 +105,20 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
               break
           }
           depth++
-          if (htmlAlias.length) {
+
+          if (isSvg && svgAlias.length) {
+            open += svgAlias + '.'
+          } else if (htmlAlias.length) {
             open += htmlAlias + '.'
           }
+
           open += name
           open += '\n' + spaces(depth) + '['
-          open += attributesToString(attribs, attributeAlias, isSvg)
+          open += attributesToString(
+            attribs,
+            isSvg ? svgAttributeAlias : htmlAttributeAlias,
+            isSvg
+          )
           open += ']\n' + spaces(depth) + '['
           fragments.push(open)
         },
