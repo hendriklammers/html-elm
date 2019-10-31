@@ -1,4 +1,5 @@
 import htmlparser from 'htmlparser2'
+import attributes from './attributes'
 
 enum Fragment {
   Open,
@@ -21,41 +22,78 @@ const previousFragment = (fragments: string[]): Fragment => {
 
 const attributesToString = (
   attribs: { [type: string]: string },
-  alias: string
+  alias: string,
+  isSvg = false
 ): string => {
   const str = Object.entries(attribs)
     .map(([key, value]) => {
-      // The Html.Attributes package uses type_
+      // Treat attributes without value as truthy boolean
+      value = value ? `"${value}"` : 'True'
+
       if (key === 'type') {
         key = 'type_'
       }
+
+      if (isSvg) {
+        if (key === 'in') {
+          key = 'in_'
+        }
+
+        if (key === 'xmlns') {
+          key = 'xmlSpace'
+        }
+
+        // Check for svg attributes
+        // TODO: Do something similar for HTML
+        key = attributes.svg[key.toLowerCase().replace(/-|:/g, '')]
+
+        // Unvalid attribute
+        if (!key) {
+          return ''
+        }
+      }
+
       if (alias.length) {
         key = alias + '.' + key
       }
-      // Treat attributes without value as truthy boolean
-      value = value ? `"${value}"` : 'True'
-      return ' ' + key + ' ' + value
+      return ` ${key} ${value}`
     })
+    .filter(attr => attr !== '')
     .join(',')
   return str ? str + ' ' : ''
 }
 
-interface Options {
-  indent?: number
-  attributeAlias?: string
-  htmlAlias?: string
-}
+// All options are optional
+type Options = Partial<{
+  indent: number
+  htmlAlias: string
+  htmlAttributeAlias: string
+  svgAlias: string
+  svgAttributeAlias: string
+}>
 
 const convert = (html: string, options: Options = {}): Promise<string> =>
   new Promise((resolve, reject) => {
-    const { indent = 4, attributeAlias = '', htmlAlias = '' } = options
+    const {
+      indent = 4,
+      htmlAlias = '',
+      htmlAttributeAlias = '',
+      svgAlias = '',
+      svgAttributeAlias = '',
+    } = options
+
     const spaces = (amount: number) => ' '.repeat(amount * indent)
     const fragments: string[] = []
     let depth = 0
+    let isSvg = false
 
     const parser = new htmlparser.Parser(
       {
         onopentag: (name, attribs) => {
+          if (name.toLowerCase() === 'svg') {
+            isSvg = true
+          }
+
           let open = ''
           switch (previousFragment(fragments)) {
             case Fragment.Open:
@@ -67,12 +105,20 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
               break
           }
           depth++
-          if (htmlAlias.length) {
+
+          if (isSvg && svgAlias.length) {
+            open += svgAlias + '.'
+          } else if (htmlAlias.length) {
             open += htmlAlias + '.'
           }
+
           open += name
           open += '\n' + spaces(depth) + '['
-          open += attributesToString(attribs, attributeAlias)
+          open += attributesToString(
+            attribs,
+            isSvg ? svgAttributeAlias : htmlAttributeAlias,
+            isSvg
+          )
           open += ']\n' + spaces(depth) + '['
           fragments.push(open)
         },
@@ -85,7 +131,11 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           }
         },
 
-        onclosetag: _ => {
+        onclosetag: name => {
+          if (name.toLowerCase() === 'svg') {
+            isSvg = false
+          }
+
           let close = ''
           switch (previousFragment(fragments)) {
             case Fragment.Close:
@@ -104,7 +154,11 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           reject(err)
         },
       },
-      { decodeEntities: true, lowerCaseAttributeNames: true }
+      {
+        decodeEntities: true,
+        lowerCaseAttributeNames: false,
+        lowerCaseTags: false,
+      }
     )
     parser.write(html)
     parser.end()
