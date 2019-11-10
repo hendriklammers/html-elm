@@ -2,8 +2,11 @@
 import program from 'commander'
 import convert from './index'
 
+// Need to use require here otherwise tsc will add the package.json to lib/
+const pkg = require('../package.json')
+
 program
-  .version('1.3.0')
+  .version(pkg.version)
   .option('-i, --indent [n]', 'Number of spaces used for indentation', 4)
   .option(
     '-t, --html-alias [prefix]',
