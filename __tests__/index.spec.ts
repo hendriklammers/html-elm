@@ -93,9 +93,6 @@ describe('Convert html to Elm', () => {
     expect(result).toBe(elm)
   })
 
-  // import Html exposing (div, h1, text)
-  // import Html.Attributes (class, id)
-
   it('has an imports option', async () => {
     const html = '<div class="wrapper"><h1 id="title">title</h1></div>'
     const elm = `import Html exposing (div, h1, text)
@@ -109,6 +106,25 @@ div
     ]`
 
     const result = await convert(html, { imports: true })
+    expect(result).toBe(elm)
+  })
+
+  it('supports imports with aliases', async () => {
+    const html = '<div class="wrapper"><h1 id="title">title</h1></div>'
+    const elm = `import Html exposing (div, h1, text)
+import Html.Attributes as Attr
+
+div
+    [ Attr.class "wrapper" ]
+    [ h1
+        [ Attr.id "title" ]
+        [ text "title" ]
+    ]`
+
+    const result = await convert(html, {
+      htmlAttributeAlias: 'Attr',
+      imports: true,
+    })
     expect(result).toBe(elm)
   })
 })
@@ -200,25 +216,31 @@ describe('Convert SVG to Elm', () => {
     </svg>
   </div>
 </section>`
-    const elm = `section
+    const elm = `import Html exposing (div, h1, section, text)
+import Html.Attributes as HA
+import Svg
+import Svg.Attributes as SA
+
+section
     []
     [ h1
-        [ H.class "title" ]
+        [ HA.class "title" ]
         [ text "Hello" ]
     , div
         []
-        [ S.svg
+        [ Svg.svg
             [ SA.width "600", SA.height "400", SA.viewBox "0 0 600 400" ]
-            [ S.rect
+            [ Svg.rect
                 [ SA.width "600", SA.height "400", SA.fill "#FFDA1A" ]
                 []
             ]
         ]
     ]`
     const result = await convert(html, {
-      htmlAttributeAlias: 'H',
-      svgAlias: 'S',
+      htmlAttributeAlias: 'HA',
+      svgAlias: 'Svg',
       svgAttributeAlias: 'SA',
+      imports: true,
     })
     expect(result).toBe(elm)
   })

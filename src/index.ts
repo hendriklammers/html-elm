@@ -98,6 +98,14 @@ const attributesToString = (
 const importsToString = (imports: ModuleImports): string => {
   const str = Object.values(imports).reduce((acc, { name, alias, values }) => {
     if (values.length) {
+      if (alias.length) {
+        if (alias === name) {
+          return `${acc}import ${name}\n`
+        } else {
+          return `${acc}import ${name} as ${alias}\n`
+        }
+      }
+
       const valuesStr = [...new Set(values.sort())].join(', ')
       return `${acc}import ${name} exposing (${valuesStr})\n`
     }
