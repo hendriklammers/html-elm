@@ -78,7 +78,7 @@ describe('Convert html to Elm', () => {
     expect(result).toBe(elm)
   })
 
-  it('has and indent option', async () => {
+  it('has an indent option', async () => {
     const html = '<div><div><p>title</p></div></div>'
     const elm = `div
   []
@@ -92,26 +92,29 @@ describe('Convert html to Elm', () => {
     const result = await convert(html, { indent: 2 })
     expect(result).toBe(elm)
   })
+
+  // import Html exposing (div, h1, text)
+  // import Html.Attributes (class, id)
+
+  it('has an imports option', async () => {
+    const html = '<div class="wrapper"><h1 id="title">title</h1></div>'
+    const elm = `import Html exposing (div, h1, text)
+import Html.Attributes exposing (class, id)
+
+div
+    [ class "wrapper" ]
+    [ h1
+        [ id "title" ]
+        [ text "title" ]
+    ]`
+
+    const result = await convert(html, { imports: true })
+    expect(result).toBe(elm)
+  })
 })
 
 describe('Convert SVG to Elm', () => {
-  it('converts svg element', async () => {
-    const svg = `<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="600" height="400" fill="#FFDA1A"/>
-</svg>`
-
-    const elm = `svg
-    [ width "600", height "400", viewBox "0 0 600 400", fill "none", xmlSpace "http://www.w3.org/2000/svg" ]
-    [ rect
-        [ width "600", height "400", fill "#FFDA1A" ]
-        []
-    ]`
-
-    const result = await convert(svg)
-    expect(result).toEqual(elm)
-  })
-
-  it('converts attributes correctly', async () => {
+  it('converts element', async () => {
     const svg = `<svg width="150" height="150" viewBox="0 0 150 150" fill="none">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M75 150C116.421 150 150 116.421 150 75C150 33.5786 116.421 0 75 0C33.5786 0 0 33.5786 0 75C0 116.421 33.5786 150 75 150ZM117.426 75L75 32.5736L32.5736 75L75 117.426L117.426 75Z" fill="#1061FF"/>
 </svg>`
