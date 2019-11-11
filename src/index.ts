@@ -1,11 +1,34 @@
 import htmlparser from 'htmlparser2'
 import attributes from './attributes'
 
+// All options are optional
+type Options = Partial<{
+  indent: number
+  htmlAlias: string
+  htmlAttributeAlias: string
+  svgAlias: string
+  svgAttributeAlias: string
+  imports: boolean
+}>
+
 enum Fragment {
   Open,
   Close,
   Text,
   None,
+}
+
+type Module = {
+  name: string
+  alias: string
+  values: string[]
+}
+
+type ModuleImports = {
+  html: Module
+  htmlAttributes: Module
+  svg: Module
+  svgAttributes: Module
 }
 
 const previousFragment = (fragments: string[]): Fragment => {
@@ -23,7 +46,8 @@ const previousFragment = (fragments: string[]): Fragment => {
 const attributesToString = (
   attribs: { [type: string]: string },
   alias: string,
-  isSvg = false
+  isSvg = false,
+  imports: ModuleImports
 ): string => {
   const str = Object.entries(attribs)
     .map(([key, value]) => {
@@ -53,24 +77,42 @@ const attributesToString = (
         }
       }
 
+      if (isSvg) {
+        imports.svgAttributes.values.push(key)
+      } else {
+        imports.htmlAttributes.values.push(key)
+      }
+
       if (alias.length) {
         key = alias + '.' + key
       }
       return ` ${key} ${value}`
     })
+
     .filter(attr => attr !== '')
     .join(',')
+
   return str ? str + ' ' : ''
 }
 
-// All options are optional
-type Options = Partial<{
-  indent: number
-  htmlAlias: string
-  htmlAttributeAlias: string
-  svgAlias: string
-  svgAttributeAlias: string
-}>
+const importsToString = (imports: ModuleImports): string => {
+  const str = Object.values(imports).reduce((acc, { name, alias, values }) => {
+    if (values.length) {
+      if (alias.length) {
+        if (alias === name) {
+          return `${acc}import ${name}\n`
+        } else {
+          return `${acc}import ${name} as ${alias}\n`
+        }
+      }
+
+      const valuesStr = [...new Set(values.sort())].join(', ')
+      return `${acc}import ${name} exposing (${valuesStr})\n`
+    }
+    return acc
+  }, '')
+  return str.length ? str + '\n' : ''
+}
 
 const convert = (html: string, options: Options = {}): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -80,10 +122,25 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
       htmlAttributeAlias = '',
       svgAlias = '',
       svgAttributeAlias = '',
+      imports = false,
     } = options
 
     const spaces = (amount: number) => ' '.repeat(amount * indent)
     const fragments: string[] = []
+    const moduleImports: ModuleImports = {
+      html: { name: 'Html', alias: htmlAlias, values: [] },
+      htmlAttributes: {
+        name: 'Html.Attributes',
+        alias: htmlAttributeAlias,
+        values: [],
+      },
+      svg: { name: 'Svg', alias: svgAlias, values: [] },
+      svgAttributes: {
+        name: 'Svg.Attributes',
+        alias: svgAttributeAlias,
+        values: [],
+      },
+    }
     let depth = 0
     let isSvg = false
 
@@ -106,10 +163,17 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           }
           depth++
 
+          // When alias option is set, add in front of opening tag
           if (isSvg && svgAlias.length) {
             open += svgAlias + '.'
           } else if (htmlAlias.length) {
             open += htmlAlias + '.'
+          }
+
+          if (isSvg) {
+            moduleImports.svg.values.push(name)
+          } else {
+            moduleImports.html.values.push(name)
           }
 
           open += name
@@ -117,15 +181,16 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           open += attributesToString(
             attribs,
             isSvg ? svgAttributeAlias : htmlAttributeAlias,
-            isSvg
+            isSvg,
+            moduleImports
           )
           open += ']\n' + spaces(depth) + '['
           fragments.push(open)
         },
 
         ontext: text => {
-          // TODO: Add support for html tags inside text
           if (text.trim().length) {
+            moduleImports.html.values.push('text')
             const tag = htmlAlias.length ? `${htmlAlias}.text` : 'text'
             fragments.push(` ${tag} "${text.trim()}"`)
           }
@@ -163,7 +228,11 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
     parser.write(html)
     parser.end()
 
-    resolve(fragments.join(''))
+    if (imports) {
+      resolve(importsToString(moduleImports) + fragments.join(''))
+    } else {
+      resolve(fragments.join(''))
+    }
   })
 
 export default convert
