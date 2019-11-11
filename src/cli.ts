@@ -7,21 +7,33 @@ const pkg = require('../package.json')
 
 program
   .version(pkg.version)
-  .option('-i, --indent [n]', 'Number of spaces used for indentation', 4)
+  .option('-i, --indent <number>', 'Number of spaces used for indentation', 4)
+  .option('-m, --imports <boolean>', 'Add module imports to output', false)
   .option(
-    '-t, --html-alias [prefix]',
+    '-t, --html-alias <prefix>',
     'Optional prefix to use in front of html tags'
   )
   .option(
-    '-a, --attribute-alias [prefix]',
-    'Optional prefix to use in front of attribute names'
+    '-a, --html-attribute-alias <prefix>',
+    'Optional prefix to use in front of html attribute names'
+  )
+  .option(
+    '-s, --svg-alias <prefix>',
+    'Optional prefix to use in front of svg tags'
+  )
+  .option(
+    '-g, --svg-attribute-alias <prefix>',
+    'Optional prefix to use in front of svg attribute names'
   )
   .parse(process.argv)
 
 const options = {
   indent: program.indent,
   htmlAlias: program.htmlAlias,
-  attributeAlias: program.attributeAlias,
+  htmlAttributeAlias: program.htmlAttributeAlias,
+  svgAlias: program.svgAlias,
+  svgAttributeAlias: program.svgAttributeAlias,
+  imports: program.imports,
 }
 
 if (process.stdin.isTTY) {
