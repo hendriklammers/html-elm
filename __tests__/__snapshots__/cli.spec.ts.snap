@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CLI should convert html to elm 1`] = `
+"div
+    []
+    [ text \\"Hello world\\" ]
+"
+`;
+
+exports[`CLI should have a --help flag 1`] = `
+"Usage: cli [options]
+
+Options:
+  -V, --version                       output the version number
+  -i, --indent <number>               Number of spaces used for indentation (default: 4)
+  -m, --imports <boolean>             Add module imports to output (default: false)
+  -t, --html-alias <alias>            Optional alias to use in front of html tags
+  -a, --html-attribute-alias <alias>  Optional alias to use in front of html attribute names
+  -s, --svg-alias <alias>             Optional alias to use in front of svg tags
+  -g, --svg-attribute-alias <alias>   Optional alias to use in front of svg attribute names
+  -h, --help                          output usage information
+"
+`;
+
+exports[`CLI should support all available options 1`] = `
+"import Html
+import Html.Attributes as H
+import Svg
+import Svg.Attributes as S
+
+Html.section
+  []
+  [ Html.h1
+    [ H.class \\"title\\" ]
+    [ Html.text \\"Hello\\" ]
+  , Html.div
+    []
+    [ Svg.svg
+      [ S.width \\"600\\", S.height \\"400\\", S.viewBox \\"0 0 600 400\\" ]
+      [ Svg.rect
+        [ S.width \\"600\\", S.height \\"400\\", S.fill \\"#FFDA1A\\" ]
+        []
+      ]
+    ]
+  ]
+"
+`;
