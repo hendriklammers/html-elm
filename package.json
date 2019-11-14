@@ -1,7 +1,7 @@
 {
   "name": "html-elm",
   "version": "3.0.0",
-  "description": "Convert html to elm-html",
+  "description": "Convert HTML and SVG to Elm code",
   "repository": "github:hendriklammers/html-elm",
   "main": "lib/index.js",
   "types": "lib/index.d.js",
