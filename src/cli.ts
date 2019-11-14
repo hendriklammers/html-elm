@@ -3,6 +3,7 @@ import program from 'commander'
 import convert from './index'
 
 // Need to use require here otherwise tsc will add the package.json to lib/
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../package.json')
 
 program
