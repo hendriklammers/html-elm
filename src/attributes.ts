@@ -1,5 +1,5 @@
 // All available SVG attributes in Elm
-export const svg: { [key: string]: string } = {
+export const svg: Record<string, string> = {
   accentheight: 'accentHeight',
   accelerate: 'accelerate',
   accumulate: 'accumulate',

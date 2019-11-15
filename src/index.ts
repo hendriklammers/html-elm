@@ -44,7 +44,7 @@ const previousFragment = (fragments: string[]): Fragment => {
 }
 
 const attributesToString = (
-  attribs: { [type: string]: string },
+  attribs: Record<string, string>,
   alias: string,
   isSvg = false,
   imports: ModuleImports
