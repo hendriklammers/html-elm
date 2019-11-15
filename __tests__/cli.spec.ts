@@ -1,40 +1,24 @@
 import path from 'path'
+import { promisify } from 'util'
 import { exec } from 'child_process'
 
+// Helper function that runs the cli binary with ts-node
 const cli = (
-  args: string[],
-  cwd: string
+  args: string[]
 ): Promise<{
-  code: number
-  error: Error | null
   stdout: string
   stderr: string
-}> =>
-  // TODO: Use util.promisify
-  new Promise(resolve => {
-    exec(
-      `ts-node ${path.resolve('./src/cli')} ${args.join(' ')}`,
-      { cwd },
-      (error, stdout, stderr) => {
-        resolve({
-          code: error && error.code ? error.code : 0,
-          error,
-          stdout,
-          stderr,
-        })
-      }
-    )
-  })
+}> => promisify(exec)(`ts-node ${path.resolve('./src/cli')} ${args.join(' ')}`)
 
 describe('CLI', () => {
   it('should have a --help flag', async () => {
-    const { stdout } = await cli(['--help'], '.')
+    const { stdout } = await cli(['--help'])
     expect(stdout).toMatchSnapshot()
   })
 
   it('should convert html to elm', async () => {
     const html = `'<div>Hello world</div>'`
-    const { stdout } = await cli([html], '.')
+    const { stdout } = await cli([html])
     expect(stdout).toMatchSnapshot()
   })
 
@@ -49,7 +33,7 @@ describe('CLI', () => {
       '-s Svg',
       '-g S',
     ]
-    const { stdout } = await cli(args, '.')
+    const { stdout } = await cli(args)
     expect(stdout).toMatchSnapshot()
   })
 })
