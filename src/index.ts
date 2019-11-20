@@ -2,7 +2,7 @@ import htmlparser from 'htmlparser2'
 import attributes from './attributes'
 
 // All options are optional
-type Options = Partial<{
+export type Options = Partial<{
   indent: number
   htmlAlias: string
   htmlAttributeAlias: string
