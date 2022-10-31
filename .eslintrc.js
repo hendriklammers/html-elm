@@ -4,7 +4,6 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
-    'prettier/@typescript-eslint',
   ],
   plugins: ['@typescript-eslint/eslint-plugin'],
   env: {
@@ -16,8 +15,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
-  },
-  rules: {
-    '@typescript-eslint/explicit-function-return-type': 0,
   },
 }

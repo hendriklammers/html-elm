@@ -1,4 +1,4 @@
-import htmlparser from 'htmlparser2'
+import * as htmlparser from 'htmlparser2'
 import attributes from './attributes'
 
 // All options are optional
@@ -89,7 +89,7 @@ const attributesToString = (
       return ` ${key} ${value}`
     })
 
-    .filter(attr => attr !== '')
+    .filter((attr) => attr !== '')
     .join(',')
 
   return str ? str + ' ' : ''
@@ -188,7 +188,7 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           fragments.push(open)
         },
 
-        ontext: text => {
+        ontext: (text) => {
           if (text.trim().length) {
             moduleImports.html.values.push('text')
             const tag = htmlAlias.length ? `${htmlAlias}.text` : 'text'
@@ -196,7 +196,7 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           }
         },
 
-        onclosetag: name => {
+        onclosetag: (name) => {
           if (name.toLowerCase() === 'svg') {
             isSvg = false
           }
@@ -215,7 +215,7 @@ const convert = (html: string, options: Options = {}): Promise<string> =>
           fragments.push(close)
         },
 
-        onerror: err => {
+        onerror: (err) => {
           reject(err)
         },
       },

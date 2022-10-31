@@ -11,11 +11,6 @@ const cli = (
 }> => promisify(exec)(`ts-node ${path.resolve('./src/cli')} ${args.join(' ')}`)
 
 describe('CLI', () => {
-  it('should have a --help flag', async () => {
-    const { stdout } = await cli(['--help'])
-    expect(stdout).toMatchSnapshot()
-  })
-
   it('should convert html to elm', async () => {
     const html = `'<div>Hello world</div>'`
     const { stdout } = await cli([html])
