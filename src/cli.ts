@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-import program from 'commander'
+import { Command } from 'commander'
 import convert from './index'
 
 // Need to use require here otherwise tsc will add the package.json to lib/
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkg = require('../package.json')
+const { version } = require('../package.json')
+
+const program = new Command()
 
 program
-  .version(pkg.version)
-  .option('-i, --indent <number>', 'Number of spaces used for indentation', 4)
+  .version(version)
+  .option('-i, --indent <number>', 'Number of spaces used for indentation', '4')
   .option('-m, --imports <boolean>', 'Add module imports to output', false)
   .option(
     '-t, --html-alias <alias>',
@@ -28,14 +30,16 @@ program
   )
   .parse(process.argv)
 
-const options = {
-  indent: program.indent,
-  htmlAlias: program.htmlAlias,
-  htmlAttributeAlias: program.htmlAttributeAlias,
-  svgAlias: program.svgAlias,
-  svgAttributeAlias: program.svgAttributeAlias,
-  imports: program.imports,
-}
+// const options = {
+//   indent: program.indent,
+//   htmlAlias: program.htmlAlias,
+//   htmlAttributeAlias: program.htmlAttributeAlias,
+//   svgAlias: program.svgAlias,
+//   svgAttributeAlias: program.svgAttributeAlias,
+//   imports: program.imports,
+// }
+
+const options = program.opts()
 
 const main = async () => {
   try {
